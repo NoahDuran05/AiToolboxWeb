@@ -34,7 +34,11 @@ public class ImageLibraryTests
     [TestCase("A simple red apple on a white table", "FLUX.2-pro")]
     [TestCase("A simple blue cube on a white table", "flux-2-pro")]
     [TestCase("A simple green tree on a white background", "gpt-image-2")]
-    public async Task GenerateImageAsync_ReturnsImageBytes(string prompt, string modelName)
+    [Category("Integration")]
+    [Ignore("Requires Azure credentials; skipped in GitHub Actions.")]
+    public async Task GenerateImageAsync_ReturnsImageBytes(
+        string prompt,
+        string modelName)
     {
         IEnumerable<byte> result =
             await _imageService.GenerateImageAsync(prompt, modelName);

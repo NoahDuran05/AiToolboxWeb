@@ -1,11 +1,11 @@
-name: .NET NUnit Tests
+name: .NET NUnit Tests and NuGet Package
 
 on:
   push:
   pull_request:
 
 jobs:
-  test:
+  build-test-pack:
     runs-on: ubuntu-latest
 
     steps:
@@ -15,16 +15,19 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '10.0.x'
 
       - name: Restore
         run: dotnet restore AiToolboxWeb.slnx
 
       - name: Build
-        run: dotnet build AiToolboxWeb.slnx --no-restore
+        run: dotnet build AiToolboxWeb.slnx --configuration Release --no-restore
 
       - name: Run Image Library Tests
-        run: dotnet test ConsoleApp3/ImageLibraryTest.csproj --verbosity normal
+        run: dotnet test ConsoleApp3/ImageLibraryTest.csproj --configuration Release --verbosity normal --filter "Category!=Integration"
 
       - name: Run Text Library Tests
-        run: dotnet test TextLibraryTest/TextLibraryTest.csproj --verbosity normal
+        run: dotnet test TextLibraryTest/TextLibraryTest.csproj --configuration Release --verbosity normal --filter "Category!=Integration"
+
+      - name: Pack NuGet Package
+        run: dotnet pack Library/Library.csproj --configuration Release --no-build --output ./nupkg

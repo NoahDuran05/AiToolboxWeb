@@ -16,6 +16,7 @@ public class TextLibraryTests
     }
 
     [Test]
+    [Category("Integration")]
     public void EmptyUserPrompt_ShouldThrow()
     {
         Assert.ThrowsAsync<System.Exception>(async () =>
@@ -27,6 +28,7 @@ public class TextLibraryTests
     }
 
     [Test]
+    [Category("Integration")]
     public void EmptySystemPrompt_ShouldThrow()
     {
         Assert.ThrowsAsync<System.Exception>(async () =>
@@ -38,6 +40,7 @@ public class TextLibraryTests
     }
 
     [Test]
+    [Category("Integration")]
     public void EmptyModelName_ShouldThrow()
     {
         Assert.ThrowsAsync<System.Exception>(async () =>
@@ -48,6 +51,7 @@ public class TextLibraryTests
                 0.7f));
     }
 
+    [Category("Integration")]
     [TestCase(
         "Reply with exactly this word: pineapple",
         "You are a helpful AI assistant.",
@@ -101,6 +105,7 @@ public class TextLibraryTests
         Assert.That(result.Trim(), Is.Not.Empty);
     }
 
+    [Category("Integration")]
     [TestCase("grok-4-20-reasoning")]
     [TestCase("DeepSeek-V4-Pro")]
     [TestCase("gpt-5.4")]

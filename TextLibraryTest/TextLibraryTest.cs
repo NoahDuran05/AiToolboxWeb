@@ -19,7 +19,7 @@ public class TextLibraryTests
     [Category("Integration")]
     public void EmptyUserPrompt_ShouldThrow()
     {
-        Assert.ThrowsAsync<System.Exception>(async () =>
+        Assert.ThrowsAsync<System.ArgumentException>(async () =>
             await _textService.GenerateTextAsync(
                 "",
                 "You are a helpful AI assistant.",
@@ -31,7 +31,7 @@ public class TextLibraryTests
     [Category("Integration")]
     public void EmptySystemPrompt_ShouldThrow()
     {
-        Assert.ThrowsAsync<System.Exception>(async () =>
+        Assert.ThrowsAsync<System.ArgumentException>(async () =>
             await _textService.GenerateTextAsync(
                 "Say hello.",
                 "",
@@ -43,7 +43,7 @@ public class TextLibraryTests
     [Category("Integration")]
     public void EmptyModelName_ShouldThrow()
     {
-        Assert.ThrowsAsync<System.Exception>(async () =>
+        Assert.ThrowsAsync<System.ArgumentException>(async () =>
             await _textService.GenerateTextAsync(
                 "Say hello.",
                 "You are a helpful AI assistant.",

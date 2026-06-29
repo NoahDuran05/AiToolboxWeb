@@ -20,14 +20,14 @@ public class ImageLibraryTests
     [Test]
     public void EmptyPrompt_ShouldThrow()
     {
-        Assert.ThrowsAsync<System.Exception>(async () =>
+        Assert.ThrowsAsync<System.ArgumentException>(async () =>
             await _imageService.GenerateImageAsync("", "FLUX.2-pro"));
     }
 
     [Test]
     public void EmptyModelName_ShouldThrow()
     {
-        Assert.ThrowsAsync<System.Exception>(async () =>
+        Assert.ThrowsAsync<System.ArgumentException>(async () =>
             await _imageService.GenerateImageAsync("A test image of a robot", ""));
     }
 

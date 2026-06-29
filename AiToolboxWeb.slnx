@@ -1,0 +1,11 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="AiToolboxWeb/AiToolboxWeb.csproj" />
+  <Project Path="ConsoleApp3/ImageLibraryTest.csproj" Id="ae534f89-09f4-4713-a6c8-a9e1661b85cf" />
+  <Project Path="Library/Library.csproj" Id="3ee86cdd-b995-47bb-993e-e00170cadd91" />
+  <Project Path="TextLibraryTest/TextLibraryTest.csproj" Id="d69fcbfc-41c6-4425-9d8e-91fdd4d8347a" />
+</Solution>

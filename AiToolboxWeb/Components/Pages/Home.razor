@@ -1,0 +1,274 @@
+﻿@page "/"
+@rendermode InteractiveServer
+
+@using AiToolboxWeb.Services
+
+@inject ImageService Flux
+@inject TextService DeepSeek
+
+<h1>AI Toolbox</h1>
+
+<button @onclick="OpenImage">
+    Generate Image
+</button>
+
+<button @onclick="OpenText">
+    Generate Text
+</button>
+
+<br />
+<br />
+
+<div class="tool-container">
+
+    @if (showImage)
+    {
+        <div class="toolbox">
+
+            <h3>Image Generator</h3>
+
+            <label>Model Name</label>
+            <br />
+            <select @bind="imageModelName">
+                <option value="FLUX.2-pro">FLUX.2-pro</option>
+                <option value="gpt-image-2">gpt-image-2</option>
+            </select>
+
+            <br />
+            <br />
+
+            <label>Prompt</label>
+            <br />
+            <textarea class="prompt-box" @bind="imagePrompt"></textarea>
+
+            <br />
+
+            <button @onclick="GenerateImage">
+                Generate
+            </button>
+
+        </div>
+    }
+
+    @if (showText)
+    {
+        <div class="toolbox">
+
+            <h3>Text Generator</h3>
+
+            <label>Model Name</label>
+            <br />
+            <select @bind="textModelName">
+                <option value="grok-4-20-reasoning">
+                    grok-4-20-reasoning
+                </option>
+
+                <option value="DeepSeek-V4-Pro">
+                    DeepSeek-V4-Pro
+                </option>
+
+                <option value="gpt-5.4">
+                    gpt-5.4
+                </option>
+            </select>
+
+            <br />
+            <br />
+
+            <label>Temperature</label>
+            <br />
+            <input type="number"
+                   step="0.1"
+                   min="0"
+                   max="2"
+                   @bind="temperature" />
+
+            <br />
+            <br />
+
+            <label>System Prompt</label>
+            <br />
+            <textarea class="prompt-box" @bind="systemPrompt"></textarea>
+
+            <br />
+            <br />
+
+            <label>User Prompt</label>
+            <br />
+            <textarea class="prompt-box" @bind="textPrompt"></textarea>
+
+            <br />
+
+            <button @onclick="GenerateText">
+                Generate
+            </button>
+
+        </div>
+    }
+    
+
+</div>
+
+@if (showImageModal)
+{
+    <div class="modal-overlay">
+
+        
+        <div class="modal-window">
+
+            <img src="@imageDataUrl"
+                 style="max-width:700px;" />
+
+            <br />
+            <br />
+
+            <button @onclick="CloseImageModal">
+                Close
+            </button>
+
+        </div>
+
+    </div>
+
+
+}
+
+@if (showTextModal)
+{
+    <div class="modal-overlay">
+
+        
+        <div class="modal-window">
+
+            <div style="max-width:700px; white-space:pre-wrap;">
+                @textResponse
+            </div>
+
+            <br />
+            <br />
+
+            <button @onclick="CloseTextModal">
+                Close
+            </button>
+
+        </div>
+
+    </div>
+
+
+}
+
+<style>
+    .tool-container {
+        display: flex;
+        gap: 30px;
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .toolbox {
+        flex: 1;
+        min-width: 400px;
+        max-width: 700px;
+    }
+
+    .prompt-box {
+        width: 100%;
+        height: 130px;
+    }
+
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-window {
+        background-color: white;
+        padding: 25px;
+        max-width: 800px;
+    }
+</style>
+
+@code {
+
+
+bool showImage;
+
+    bool showText;
+
+    bool showImageModal;
+
+    bool showTextModal;
+
+    string imagePrompt = "";
+
+    string imageModelName =
+        "FLUX.2-pro";
+
+    string textPrompt = "";
+
+    string systemPrompt =
+        "You are a helpful AI assistant.";
+
+    string textModelName =
+        "DeepSeek-V4-Pro";
+
+    float temperature = 0.7f;
+
+    string? imageDataUrl;
+
+    string? textResponse;
+
+    IEnumerable<byte>? imageBytes;
+
+    void OpenImage()
+    {
+        showImage = true;
+    }
+
+    void OpenText()
+    {
+        showText = true;
+    }
+
+    async Task GenerateImage()
+    {
+        imageBytes =
+            await Flux.GenerateImageAsync(
+                imagePrompt,
+                imageModelName);
+
+        imageDataUrl =
+            $"data:image/png;base64,{Convert.ToBase64String(imageBytes.ToArray())}";
+
+        showImageModal = true;
+    }
+
+    async Task GenerateText()
+    {
+        textResponse =
+            await DeepSeek.GenerateTextAsync(
+                textPrompt,
+                systemPrompt,
+                textModelName,
+                temperature);
+
+        showTextModal = true;
+    }
+
+    void CloseImageModal()
+    {
+        showImageModal = false;
+    }
+
+    void CloseTextModal()
+    {
+        showTextModal = false;
+    }
+
+
+}

@@ -3,8 +3,8 @@
 
 @using AiToolboxWeb.Services
 
-@inject ImageService Flux
-@inject TextService DeepSeek
+@inject ImageServiceLibrary Flux
+@inject TextServiceLibrary DeepSeek
 
 <h1>AI Toolbox</h1>
 
@@ -251,7 +251,7 @@ bool showImage;
     async Task GenerateText()
     {
         textResponse =
-            await DeepSeek.GenerateTextAsync(
+            await DeepSeek.GenerateTextAsync( 
                 textPrompt,
                 systemPrompt,
                 textModelName,

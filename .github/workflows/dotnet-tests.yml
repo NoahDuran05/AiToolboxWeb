@@ -24,10 +24,8 @@ jobs:
         run: dotnet build AiToolboxWeb.slnx --configuration Release --no-restore
 
       - name: Run Image Library Tests
-        run: dotnet test ConsoleApp3/ImageLibraryTest.csproj --configuration Release --verbosity normal --filter "Category!=Integration"
+        run: dotnet test GeneratorTest\GeneratorTest.csproj --configuration Release --verbosity normal --filter "Category!=Integration"
 
-      - name: Run Text Library Tests
-        run: dotnet test TextLibraryTest/TextLibraryTest.csproj --configuration Release --verbosity normal --filter "Category!=Integration"
 
       - name: Pack NuGet Package
         run: dotnet pack Library/Library.csproj --configuration Release --no-build --output ./nupkg

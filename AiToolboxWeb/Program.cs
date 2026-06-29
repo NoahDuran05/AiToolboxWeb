@@ -10,10 +10,10 @@ builder.Services.AddRazorComponents()
 
 
 builder.Services.AddScoped<
-    TextService>();
+    TextServiceLibrary>();
 
 builder.Services.AddScoped<
-    ImageService>();
+    ImageServiceLibrary>();
 
 var app = builder.Build();
 

@@ -24,7 +24,7 @@ jobs:
         run: dotnet build AiToolboxWeb.slnx --configuration Release --no-restore
 
       - name: Run Image Library Tests
-        run: dotnet test GeneratorTest\GeneratorTest.csproj --configuration Release --verbosity normal --filter "Category!=Integration"
+        run: dotnet test GeneratorTest/GeneratorTest.csproj --configuration Release --verbosity normal --filter "Category!=Integration"
 
 
       - name: Pack NuGet Package

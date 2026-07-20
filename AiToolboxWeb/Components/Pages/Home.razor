@@ -1,7 +1,7 @@
 ﻿@page "/"
 @rendermode InteractiveServer
 
-@using AiToolboxWeb.Services
+@using Aloha.Generator
 
 @inject ImageServiceLibrary Flux
 @inject TextServiceLibrary DeepSeek
@@ -19,16 +19,23 @@
 <br />
 <br />
 
+@if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="error-message">
+        <strong>Error:</strong> @errorMessage
+    </div>
+}
+
 <div class="tool-container">
 
     @if (showImage)
     {
         <div class="toolbox">
-
             <h3>Image Generator</h3>
 
             <label>Model Name</label>
             <br />
+
             <select @bind="imageModelName">
                 <option value="FLUX.2-pro">FLUX.2-pro</option>
                 <option value="gpt-image-2">gpt-image-2</option>
@@ -39,25 +46,27 @@
 
             <label>Prompt</label>
             <br />
-            <textarea class="prompt-box" @bind="imagePrompt"></textarea>
+
+            <textarea class="prompt-box"
+                      @bind="imagePrompt"></textarea>
 
             <br />
 
-            <button @onclick="GenerateImage">
-                Generate
+            <button @onclick="GenerateImage"
+                    disabled="@isGeneratingImage">
+                @(isGeneratingImage ? "Generating..." : "Generate")
             </button>
-
         </div>
     }
 
     @if (showText)
     {
         <div class="toolbox">
-
             <h3>Text Generator</h3>
 
             <label>Model Name</label>
             <br />
+
             <select @bind="textModelName">
                 <option value="grok-4-20-reasoning">
                     grok-4-20-reasoning
@@ -77,10 +86,11 @@
 
             <label>Temperature</label>
             <br />
+
             <input type="number"
                    step="0.1"
                    min="0"
-                   max="2"
+                   max="1"
                    @bind="temperature" />
 
             <br />
@@ -88,36 +98,37 @@
 
             <label>System Prompt</label>
             <br />
-            <textarea class="prompt-box" @bind="systemPrompt"></textarea>
+
+            <textarea class="prompt-box"
+                      @bind="systemPrompt"></textarea>
 
             <br />
             <br />
 
             <label>User Prompt</label>
             <br />
-            <textarea class="prompt-box" @bind="textPrompt"></textarea>
+
+            <textarea class="prompt-box"
+                      @bind="textPrompt"></textarea>
 
             <br />
 
-            <button @onclick="GenerateText">
-                Generate
+            <button @onclick="GenerateText"
+                    disabled="@isGeneratingText">
+                @(isGeneratingText ? "Generating..." : "Generate")
             </button>
-
         </div>
     }
-    
 
 </div>
 
-@if (showImageModal)
+@if (showImageModal && !string.IsNullOrWhiteSpace(imageDataUrl))
 {
     <div class="modal-overlay">
-
-        
         <div class="modal-window">
-
             <img src="@imageDataUrl"
-                 style="max-width:700px;" />
+                 alt="Generated image"
+                 class="generated-image" />
 
             <br />
             <br />
@@ -125,22 +136,15 @@
             <button @onclick="CloseImageModal">
                 Close
             </button>
-
         </div>
-
     </div>
-
-
 }
 
 @if (showTextModal)
 {
     <div class="modal-overlay">
-
-        
         <div class="modal-window">
-
-            <div style="max-width:700px; white-space:pre-wrap;">
+            <div class="text-response">
                 @textResponse
             </div>
 
@@ -150,12 +154,8 @@
             <button @onclick="CloseTextModal">
                 Close
             </button>
-
         </div>
-
     </div>
-
-
 }
 
 <style>
@@ -168,7 +168,7 @@
 
     .toolbox {
         flex: 1;
-        min-width: 400px;
+        min-width: 300px;
         max-width: 700px;
     }
 
@@ -180,95 +180,159 @@
     .modal-overlay {
         position: fixed;
         inset: 0;
+        z-index: 1000;
         background-color: rgba(0, 0, 0, 0.6);
         display: flex;
         align-items: center;
         justify-content: center;
+        padding: 20px;
     }
 
     .modal-window {
         background-color: white;
         padding: 25px;
+        width: 100%;
         max-width: 800px;
+        max-height: 90vh;
+        overflow: auto;
+    }
+
+    .generated-image {
+        display: block;
+        max-width: 100%;
+        height: auto;
+    }
+
+    .text-response {
+        max-width: 700px;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    .error-message {
+        margin: 15px 0;
+        padding: 12px;
+        border: 1px solid #b42318;
+        color: #b42318;
     }
 </style>
 
 @code {
+    private bool showImage;
+    private bool showText;
+    private bool showImageModal;
+    private bool showTextModal;
+    private bool isGeneratingImage;
+    private bool isGeneratingText;
 
+    private string imagePrompt = "";
+    private string imageModelName = "FLUX.2-pro";
 
-bool showImage;
-
-    bool showText;
-
-    bool showImageModal;
-
-    bool showTextModal;
-
-    string imagePrompt = "";
-
-    string imageModelName =
-        "FLUX.2-pro";
-
-    string textPrompt = "";
-
-    string systemPrompt =
+    private string textPrompt = "";
+    private string systemPrompt =
         "You are a helpful AI assistant.";
 
-    string textModelName =
+    private string textModelName =
         "DeepSeek-V4-Pro";
 
-    float temperature = 0.7f;
+    private float temperature = 0.7f;
 
-    string? imageDataUrl;
+    private string? imageDataUrl;
+    private string? textResponse;
+    private string? errorMessage;
 
-    string? textResponse;
-
-    IEnumerable<byte>? imageBytes;
-
-    void OpenImage()
+    private void OpenImage()
     {
         showImage = true;
+        errorMessage = null;
     }
 
-    void OpenText()
+    private void OpenText()
     {
         showText = true;
+        errorMessage = null;
     }
 
-    async Task GenerateImage()
+    private async Task GenerateImage()
     {
-        imageBytes =
-            await Flux.GenerateImageAsync(
-                imagePrompt,
-                imageModelName);
+        if (string.IsNullOrWhiteSpace(imagePrompt))
+        {
+            errorMessage = "Enter an image prompt.";
+            return;
+        }
 
-        imageDataUrl =
-            $"data:image/png;base64,{Convert.ToBase64String(imageBytes.ToArray())}";
+        try
+        {
+            isGeneratingImage = true;
+            errorMessage = null;
 
-        showImageModal = true;
+            IEnumerable<byte> result =
+                await Flux.GenerateImageAsync(
+                    imagePrompt,
+                    imageModelName);
+
+            byte[] imageBytes = result.ToArray();
+
+            if (imageBytes.Length == 0)
+            {
+                throw new InvalidOperationException(
+                    "The image service returned no image data.");
+            }
+
+            imageDataUrl =
+                $"data:image/png;base64,{Convert.ToBase64String(imageBytes)}";
+
+            showImageModal = true;
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+        }
+        finally
+        {
+            isGeneratingImage = false;
+        }
     }
 
-    async Task GenerateText()
+    private async Task GenerateText()
     {
-        textResponse =
-            await DeepSeek.GenerateTextAsync( 
-                textPrompt,
-                systemPrompt,
-                textModelName,
-                temperature);
+        if (string.IsNullOrWhiteSpace(textPrompt))
+        {
+            errorMessage = "Enter a text prompt.";
+            return;
+        }
 
-        showTextModal = true;
+        try
+        {
+            isGeneratingText = true;
+            errorMessage = null;
+
+            textResponse =
+                await DeepSeek.GenerateTextAsync(
+                    textPrompt,
+                    systemPrompt,
+                    textModelName,
+                    temperature);
+
+            showTextModal = true;
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+        }
+        finally
+        {
+            isGeneratingText = false;
+        }
     }
 
-    void CloseImageModal()
+    private void CloseImageModal()
     {
         showImageModal = false;
     }
 
-    void CloseTextModal()
+    private void CloseTextModal()
     {
         showTextModal = false;
     }
-
-
 }

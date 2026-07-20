@@ -1,8 +1,8 @@
-﻿using AiToolboxWeb.Services;
+﻿using Aloha.Generator;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
-namespace TextLibraryTest;
+namespace Aloha.Generator.Test.Services;
 
 [TestFixture]
 public class TextLibraryTests

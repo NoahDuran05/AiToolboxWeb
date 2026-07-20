@@ -4,7 +4,7 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="AiToolboxWeb/AiToolboxWeb.csproj" />
-  <Project Path="GeneratorTest/GeneratorTest.csproj" />
-  <Project Path="Library/Library.csproj" Id="3ee86cdd-b995-47bb-993e-e00170cadd91" />
+  <Project Path="AiToolboxWeb/Aloha.Generator.WebSite.csproj" />
+  <Project Path="GeneratorTest/Aloha.Generator.Test.csproj" />
+  <Project Path="Library/Aloha.Generator.csproj" Id="3ee86cdd-b995-47bb-993e-e00170cadd91" />
 </Solution>

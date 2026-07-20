@@ -17,6 +17,9 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+      - name: Show repository files
+        run: find . -maxdepth 3 -type f
+
       - name: Restore
         run: dotnet restore AiToolboxWeb.slnx
 
@@ -24,8 +27,18 @@ jobs:
         run: dotnet build AiToolboxWeb.slnx --configuration Release --no-restore
 
       - name: Run Image Library Tests
-        run: dotnet test GeneratorTest/GeneratorTest.csproj --configuration Release --verbosity normal --filter "Category!=Integration"
-
+        run: >
+          dotnet test
+          Aloha.Generator.Test/Aloha.Generator.Test.csproj
+          --configuration Release
+          --no-build
+          --verbosity normal
+          --filter "Category!=Integration"
 
       - name: Pack NuGet Package
-        run: dotnet pack Library/Library.csproj --configuration Release --no-build --output ./nupkg
+        run: >
+          dotnet pack
+          Aloha.Generator/Aloha.Generator.csproj
+          --configuration Release
+          --no-build
+          --output ./nupkg

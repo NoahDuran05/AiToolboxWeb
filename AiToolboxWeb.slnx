@@ -1,10 +1,5 @@
 <Solution>
-  <Configurations>
-    <Platform Name="Any CPU" />
-    <Platform Name="x64" />
-    <Platform Name="x86" />
-  </Configurations>
-  <Project Path="AiToolboxWeb/Aloha.Generator.WebSite.csproj" />
-  <Project Path="GeneratorTest/Aloha.Generator.Test.csproj" />
-  <Project Path="Library/Aloha.Generator.csproj" Id="3ee86cdd-b995-47bb-993e-e00170cadd91" />
+  <Project Path="Aloha.Generator.Test/Aloha.Generator.Test.csproj" />
+  <Project Path="Aloha.Generator.WebSite/Aloha.Generator.WebSite.csproj" />
+  <Project Path="Aloha.Generator/Aloha.Generator.csproj" />
 </Solution>
